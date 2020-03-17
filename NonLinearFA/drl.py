@@ -60,4 +60,7 @@ train_cls = trainer(args, data_list, val_net, optimizer, device)
 test_cls = test(args, env, np.ones((env.n**2,env.action_space.n))/env.action_space.n, device)
 val_net, error_list = train_cls.train(test_cls)
 
-print(error_list)
+if args.log == 1 and args.save == 1:
+	filename = "drl_"+args.trace_type+"_env_"+str(args.env)+"_size_"+str(args.n)+"_lr_"+str(args.lr)+"_seed_"+str(args.seed)+"_epi_"+str(args.episodes)
+	with open("results_"+str(args.env)+"/"+filename+"_all_errors.pkl", "wb") as f:
+		pickle.dump(error_list, f)
