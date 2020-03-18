@@ -31,7 +31,7 @@ class trainer():
 					c_grad.append(c_val)
 					beta_list.append(beta)
 
-				if self.args.trace_type == 'gated':
+				if self.args.trace_type == "gated":
 					t_n_bar = td_errors[-1]
 					t_n = beta_list[-1] * c_grad[-1] * t_n_bar
 					nxt_beta = beta_list[-1]
@@ -42,7 +42,7 @@ class trainer():
 						gradient -= t_n
 						nxt_beta = beta
 
-				elif self.args.trace_type == 'accumulating':
+				elif self.args.trace_type == "accumulating":
 					t_n_bar = td_errors[-1]
 					t_n = c_grad[-1] * t_n_bar
 					nxt_beta = beta_list[-1]
@@ -52,6 +52,9 @@ class trainer():
 						t_n = grad * t_n_bar
 						gradient -= t_n
 						nxt_beta = beta
+
+				else:
+					raise NotImplementedError
 
 				self.optimizer.zero_grad()
 				gradient.backward()
