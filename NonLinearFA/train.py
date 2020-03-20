@@ -11,7 +11,7 @@ class trainer():
 
 	def train(self, test_cls):
 		error_list = []
-		if self.args.env == "gridWorld":
+		if self.args.env == "gridWorld" or self.args.env == "lightWorld":
 			for episode in range(self.args.episodes):
 				td_errors = []
 				c_grad = []
@@ -81,8 +81,8 @@ class trainer():
 					mse = test_cls.MSE(self.val_net)
 					error_list.append(mse.item())
 
-		elif self.args.env == "lightWorld":
-			pass
+		#elif self.args.env == "lightWorld":
+		#	pass
 
 		else:
 			raise NotImplementedError

@@ -4,7 +4,7 @@ from gym.envs.registration import register
 from scipy import signal
 
 class lightWorld():
-    def __init__(self, n=6, p=0.2, slippery=0):
+    def __init__(self, n=6, p=0.7, slippery=0):
         self.n = n
         self.p = p
         # From any state the agent can perform one of four actions, up, down, left or right
@@ -13,8 +13,8 @@ class lightWorld():
         self.directions = [np.array((-1,0)), np.array((1,0)), np.array((0,-1)), np.array((0,1))]
         self.slippery = slippery
         self.goal = (self.n-1, self.n-1)
-        self.init_states = [(i,j) for i in range(self.n) for j in range(self.n)]
-        self.init_states.remove(self.goal)
+        self.init_states = [(i,j) for i in range(4) for j in range(4)]
+        #self.init_states.remove(self.goal)
         self.feat = self.features(self.goal)
         self.reward = 0
         self.goal_reward = 5

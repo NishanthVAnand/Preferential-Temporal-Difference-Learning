@@ -4,18 +4,18 @@ from gym.envs.registration import register
 from scipy import signal
 
 class gridWorld():
-    def __init__(self, n=6, slippery=0): # size in multiples of 3 for symmetry
+    def __init__(self, n=6, slippery=0): # size in multiples of 4 for symmetry
         self.n = n
         # From any state the agent can perform one of four actions, up, down, left or right
         self.action_space = spaces.Discrete(4)
         self.observation_space = spaces.Tuple((spaces.Discrete(self.n), spaces.Discrete(self.n)))
-        self.po_states = list(set([(i,j) for i in range(self.n//3 * 1, self.n//3 * 2) for j in range(self.n)] + \
-            [(i,j) for i in range(self.n) for j in range(self.n//3 * 1, self.n//3 * 2)]))
+        self.po_states = list(set([(i,j) for i in range(self.n//4 * 1, self.n//4 * 3) for j in range(self.n)] + \
+            [(i,j) for i in range(self.n) for j in range(self.n//4 * 1, self.n//4 * 3)]))
         self.directions = [np.array((-1,0)), np.array((1,0)), np.array((0,-1)), np.array((0,1))]
         self.slippery = slippery
         self.goal = (self.n-1, self.n-1)
-        self.init_states = [(i,j) for i in range(self.n) for j in range(self.n)]
-        self.init_states.remove(self.goal)
+        self.init_states = [(i,j) for i in range(self.n//2) for j in range(self.n//2)]
+        #self.init_states.remove(self.goal)
         self.feat = self.features(self.goal)
         self.goal_reward = 5
         self.reward = 0.0
@@ -26,7 +26,7 @@ class gridWorld():
 
     def features(self, state):
         if state in self.po_states:
-            img = np.random.normal(1,1, size=(self.n, self.n))
+            img = np.random.normal(0,1, size=(self.n, self.n))
         else:
             img = np.zeros((self.n, self.n))
             img[state[0], state[1]] = 1
