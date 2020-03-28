@@ -48,6 +48,5 @@ class test():
 
 		v_pi_m = self.v_pi * v_pi_mask
 		v_pi_m = v_pi_m[v_pi_m != 0]
-		print(v_pi_m, "\n", v_pred, "\n----\n")
 
 		return self.criterion(torch.tensor(v_pred), torch.from_numpy(v_pi_m).float())
