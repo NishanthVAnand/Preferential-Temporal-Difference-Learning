@@ -13,10 +13,15 @@ class elevator():
         self.action_space = spaces.Discrete(2) #number of actions - 2 - [0: go up, 1: go down]
         self.elevator_states = [(0,3), (1+self.coridor_chain, 4), (1+self.coridor_chain, 2)]
         self.goal_states = [(2+2*self.coridor_chain,3), (2+2*self.coridor_chain,5), (2+2*self.coridor_chain,1)]
-        self.goal_reward = {(2+2*self.coridor_chain,3):np.random.normal(2,self.var),\
-         (2+2*self.coridor_chain,5):np.random.normal(3,self.var), (2+2*self.coridor_chain,1):np.random.normal(1,self.var)}
+        self.goal_reward = {(2+2*self.coridor_chain,3):2, (2+2*self.coridor_chain,5):3, (2+2*self.coridor_chain,1):1}
         self.observation_space = spaces.Tuple((spaces.Discrete(3+2*self.coridor_chain), spaces.Discrete(5)))
         self.feat = self.features(self.state)
+
+    def generate_rew(self, state):
+        if state in self.goal_states:
+            return np.random.normal(self.goal_reward[state], self.var)
+        else:
+            return 0
 
     def seed(self, seed=None):
         np.random.seed(seed)
@@ -42,18 +47,19 @@ class elevator():
         
         # give a reward if in the terminal state
         if self.state in self.goal_states:
-                reward = self.goal_reward[self.state]
+                reward = self.generate_rew(self.state)
                 done = True
                 self.state = self.reset()
 
         else: 
-            self.state = (self.state[0] + 1, self.state[1]) # move forward along the chain every step
             # elevator takes up or down
             if self.state in self.elevator_states:
                 if not action:
-                    self.state[1] = (self.state[0], self.state[1] + 1)
+                    self.state = (self.state[0], self.state[1] + 1)
                 else:
-                    self.state[1] = (self.state[0], self.state[1] - 1)
+                    self.state = (self.state[0], self.state[1] - 1)
+
+            self.state = (self.state[0]+1, self.state[1]) # move forward along the chain every step
 
         return self.features(self.state), self.state, reward, done, {}
 

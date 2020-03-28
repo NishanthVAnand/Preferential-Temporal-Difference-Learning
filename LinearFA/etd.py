@@ -46,14 +46,16 @@ if args.env == "simpleChain":
 	weights = np.zeros_like(np.array(env.feat).reshape(-1,1))
 
 elif args.env == "YChain":
-	filename = "etd"+"_env_"+str(args.env)+"_len_"+str(args.len)+"_lr_"+str(args.lr)+"_seed_"+str(args.seed)
+	filename = "etd"+"_int_"+str(args.intrst)+"_env_"+str(args.env)+"_len_"+str(args.len)+"_lr_"+str(args.lr)+"_seed_"+str(args.seed)
 
 	def fbetas(env):
 		def getbetas(state):
 			if state in [0, args.len, args.len*2]:
-				return 1
+				#return 1
+				return args.intrst
 			else:
-				return 0
+				#return 0
+				return args.intrst
 		return getbetas
 
 	def finterest(env):
@@ -76,14 +78,16 @@ elif args.env == "YChain":
 	weights = np.zeros_like(np.array(env.feat).reshape(-1,1))
 
 elif args.env == "elevator":
-	filename = "etd"+"_env_"+str(args.env)+"_len_"+str(args.len)+"_lr_"+str(args.lr)+"_seed_"+str(args.seed)
+	filename = "etd"+"_int_"+str(args.intrst)+"_env_"+str(args.env)+"_len_"+str(args.len)+"_lr_"+str(args.lr)+"_seed_"+str(args.seed)
 	
 	def fbetas(env):
 		def getbetas(state):
 			if state in env.goal_states or state in env.elevator_states:
-				return 1
+				#return 1
+				return args.intrst
 			else:
-				return 0
+				#return 0
+				return args.intrst
 		return getbetas
 
 	def finterest(env):

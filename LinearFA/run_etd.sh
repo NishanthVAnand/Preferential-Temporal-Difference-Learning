@@ -1,12 +1,16 @@
 #!/bin/bash
 
-while read intr;
+while read len;
 do
-	while read lr;
+	while read intr;
 	do
-		while read seed;
+		while read lr;
 		do
-			python etd.py --seed="$seed" --lr="$lr" --intrst="$intr" --env=$1 --episodes=$2
-		done < seed.txt
-	done < lr.txt
-done < interest.txt
+			while read seed;
+			do
+				echo "--seed="$seed" --lr="$lr" --intrst="$intr" --len="$len" --env=$1 --episodes=$2"
+				python etd.py --seed="$seed" --lr="$lr" --intrst="$intr" --len="$len" --env=$1 --episodes=$2
+			done < seed.txt
+		done < lr.txt
+	done < interest.txt
+done < len.txt

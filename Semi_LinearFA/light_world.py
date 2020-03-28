@@ -3,37 +3,34 @@ from gym import core, spaces
 from gym.envs.registration import register
 from scipy import signal
 
-class gridWorld():
-    def __init__(self, n=6, slippery=0, po=True): # size in multiples of 4 for symmetry
+class lightWorld():
+    def __init__(self, n=6, p=0.7, slippery=0):
         self.n = n
+        self.p = p
         # From any state the agent can perform one of four actions, up, down, left or right
         self.action_space = spaces.Discrete(4)
         self.observation_space = spaces.Tuple((spaces.Discrete(self.n), spaces.Discrete(self.n)))
-        if po:
-            self.po_states = list(set([(i,j) for i in range(self.n//4 * 1, self.n//4 * 3) for j in range(self.n)] + \
-                [(i,j) for i in range(self.n) for j in range(self.n//4 * 1, self.n//4 * 3)]))
-        else:
-            self.po_states = []
         self.directions = [np.array((-1,0)), np.array((1,0)), np.array((0,-1)), np.array((0,1))]
         self.slippery = slippery
         self.goal = (self.n-1, self.n-1)
-        self.init_states = [(i,j) for i in range(self.n//2) for j in range(self.n//2)]
+        self.init_states = [(i,j) for i in range(4) for j in range(4)]
         #self.init_states.remove(self.goal)
         self.feat = self.features(self.goal)
+        self.reward = 0
         self.goal_reward = 5
-        self.reward = 0.0
 
     def seed(self, seed=None):
         np.random.seed(seed)
         return [seed]
 
     def features(self, state):
-        if state in self.po_states:
-            img = np.random.normal(0,1, size=(self.n, self.n))
+        light = np.random.uniform() < self.p
+        if not light:
+            img = np.random.normal(1,1, size=(self.n, self.n))
         else:
             img = np.zeros((self.n, self.n))
             img[state[0], state[1]] = 1
-        return img
+        return img, int(light)
 
     def generateP(self):
         P = np.zeros((self.action_space.n, self.n**2, self.n**2))
@@ -77,10 +74,11 @@ class gridWorld():
                         if idx_cell == self.goal:
                             R[c_a][self.n*idx_i+idx_j] += 1/3 * self.slippery * self.goal_reward
                         else:
-                            R[c_a][self.n*idx_i+idx_j] += self.reward * (1 - self.slippery)
+                            R[c_a][self.n*idx_i+idx_j] += 1/3 * self.slippery * self.reward
 
         for c_a in range(self.action_space.n):
             R[c_a][self.n*self.goal[0]+self.n-1] = 0
+
         return R
 
     def empty_around(self, cell):
@@ -97,7 +95,8 @@ class gridWorld():
         idx = np.random.choice(range(len(self.init_states)))
         state = self.init_states[idx]
         self.currentcell = state
-        return self.features(state), state, not(int(state in self.po_states))
+        feat, light = self.features(state)
+        return feat, state, light
 
     def step(self, action):
         """
@@ -120,10 +119,10 @@ class gridWorld():
         if self.observation_space.contains(nextcell):
             self.currentcell = nextcell
         state = self.currentcell
-        
+        done = state == self.goal
         if state == self.goal:
           reward = self.goal_reward
         else:
-          reward = self.reward
-        done = state == self.goal
-        return self.features(state), state, int(not(state in self.po_states)), reward, done, None
+          reward = self.goal_reward
+        feat, light = self.features(state)
+        return feat, state, light, reward, done, None

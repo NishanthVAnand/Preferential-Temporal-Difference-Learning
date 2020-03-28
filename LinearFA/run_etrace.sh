@@ -1,9 +1,13 @@
 #!/bin/bash
 
-while read lr;
+while read len;
 do
-	while read seed;
+	while read lr;
 	do
-		python etrace.py --seed="$seed" --lr="$lr" --env=$1 --episodes=$2
-	done < seed.txt
-done < lr.txt
+		while read seed;
+		do
+			echo "--seed="$seed" --lr="$lr" --len="$len" --env=$1 --episodes=$2"
+			python etrace.py --seed="$seed" --lr="$lr" --len="$len" --env=$1 --episodes=$2
+		done < seed.txt
+	done < lr.txt
+done < len.txt
