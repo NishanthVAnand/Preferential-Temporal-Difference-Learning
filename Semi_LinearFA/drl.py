@@ -106,14 +106,18 @@ for seed in range(total_seeds):
 	val_net, error_list = train_cls.train(test_cls)
 
 	if args.save == 1:
-		if args.trace_type == "etd":
-			filename = "drl_"+args.trace_type+"_int_"+str(args.intrst)+"_env_"+str(args.env)+"_size_"+str(args.n)+"_lr_"+str(args.lr)+"_seed_"+str(args.seed)+"_epi_"+str(args.episodes)
+		if args.train_feat:
+			filename = "drl_MC_FO"+"_env_"+str(args.env)+"_size_"+str(args.n)+"_lr_"+str(args.lr)+"_seed_"+str(args.seed)+"_epi_"+str(args.episodes)
+
 		else:
-			filename = "drl_"+args.trace_type+"_env_"+str(args.env)+"_size_"+str(args.n)+"_lr_"+str(args.lr)+"_seed_"+str(args.seed)+"_epi_"+str(args.episodes)
+			if args.trace_type == "etd":
+				filename = "drl_"+args.trace_type+"_int_"+str(args.intrst)+"_env_"+str(args.env)+"_size_"+str(args.n)+"_lr_"+str(args.lr)+"_seed_"+str(args.seed)+"_epi_"+str(args.episodes)
+			else:
+				filename = "drl_"+args.trace_type+"_env_"+str(args.env)+"_size_"+str(args.n)+"_lr_"+str(args.lr)+"_seed_"+str(args.seed)+"_epi_"+str(args.episodes)
 
 		with open("results_"+str(args.env)+"/"+filename+"_all_errors.pkl", "wb") as f:
 			pickle.dump(error_list, f)
 
 	if args.log == 1 and args.train_feat:
-		filename = "size_"+str(args.n)+"_lr_"+str(args.lr)+"_epi_"+str(args.episodes)+".pt"
-		torch.save(val_net.state_dict(), filename)
+		filename = "drl_MC_FO"+"_env_"+str(args.env)+"_size_"+str(args.n)+"_lr_"+str(args.lr)+"_seed_"+str(args.seed)+"_epi_"+str(args.episodes)+".pt"
+		torch.save(val_net.state_dict(), "models_"+str(args.env)+"/"+filename)
