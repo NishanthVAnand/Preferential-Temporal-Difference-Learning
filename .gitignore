@@ -110,6 +110,7 @@ results_randomWalk/
 results_YChain/
 results_gridWorld/
 results_lightWorld/
+models_gridWorld/
 plots/
 
 *.pt

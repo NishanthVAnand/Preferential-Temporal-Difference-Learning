@@ -51,7 +51,7 @@ class test():
 		v_pi_m = self.v_pi * v_pi_mask
 		v_pi_m = v_pi_m[v_pi_m != 0]
 
-		return self.criterion(torch.tensor(v_pred), torch.from_numpy(v_pi_m).float())
+		return self.criterion(torch.tensor(v_pred).float(), torch.from_numpy(v_pi_m).float())
 
 	def MSE_linear(self, feat_net, val_net):
 		test_data = []
