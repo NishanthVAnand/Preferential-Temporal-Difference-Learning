@@ -96,8 +96,8 @@ for seed in range(total_seeds):
 		val_net.apply(weights_init)
 		optimizer = optim.Adam(val_net.parameters(), lr=args.lr)
 		#scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, factor=0.1, patience=10, threshold=0.03, verbose=True)
-		scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=20, gamma=0.6)
-		#scheduler = None
+		#scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=20, gamma=0.6)
+		scheduler = None
 		train_cls = trainer(args, val_net, data_list, device, optimizer, scheduler)
 	else:
 		train_cls = trainer(args, feat_net, data_list, device, linearNet=val_net)
@@ -105,7 +105,7 @@ for seed in range(total_seeds):
 	test_cls = test(args, env, np.ones((env.n**2,env.action_space.n))/env.action_space.n, device)
 	val_net, error_list = train_cls.train(test_cls)
 
-	if args.log == 1 and args.save == 1:
+	if args.save == 1:
 		if args.trace_type == "etd":
 			filename = "drl_"+args.trace_type+"_int_"+str(args.intrst)+"_env_"+str(args.env)+"_size_"+str(args.n)+"_lr_"+str(args.lr)+"_seed_"+str(args.seed)+"_epi_"+str(args.episodes)
 		else:
@@ -114,10 +114,6 @@ for seed in range(total_seeds):
 		with open("results_"+str(args.env)+"/"+filename+"_all_errors.pkl", "wb") as f:
 			pickle.dump(error_list, f)
 
-	if args.log == 1 and args.save == 1 and args.train_feat:
+	if args.log == 1 and args.train_feat:
 		filename = "size_"+str(args.n)+"_lr_"+str(args.lr)+"_epi_"+str(args.episodes)+".pt"
 		torch.save(val_net.state_dict(), filename)
-
-	feat = np.array(test_cls.get_feat(val_net))
-	import pdb; pdb.set_trace()
-	print(error_list)
