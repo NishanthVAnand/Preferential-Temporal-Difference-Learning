@@ -116,7 +116,6 @@ results_AC/
 results_AC_linear/
 results_gridWorld/
 results_True_AC/
-models_gridWorld/
 Backprop/
 
 *.pt

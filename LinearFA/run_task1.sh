@@ -1,5 +1,7 @@
 #!/bin/bash
 
+mkdir -p results_YChain
+
 while IFS=, read alg len lr;
 do
 	while read seed;

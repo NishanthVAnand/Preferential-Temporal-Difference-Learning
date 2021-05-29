@@ -1,5 +1,7 @@
 #!/bin/bash
 
+mkdir -p results_gridWorld2
+
 while IFS=, read size trace interest lr epi;
 do
 	echo --n="$size" --trace_type="$trace" --intrst="$interest" --lr="$lr" --env="gridWorld2" --episodes="$epi"

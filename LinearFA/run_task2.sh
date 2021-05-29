@@ -1,5 +1,7 @@
 #!/bin/bash
 
+mkdir -p results_elevator
+
 while IFS=, read alg len lr;
 do
 	while read seed;

@@ -1,8 +1,12 @@
 #!/bin/bash
 
+mkdir -p data
+
 python data_generate.py --n=8 --env="gridWorld2"
 python data_generate.py --n=12 --env="gridWorld2"
 python data_generate.py --n=16 --env="gridWorld2"
+
+mkdir -p results_gridWorld2
 
 while IFS=, read size trace h lr interest;
 do
