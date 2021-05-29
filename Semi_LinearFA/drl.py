@@ -1,6 +1,5 @@
 import numpy as np
 import gym
-import matplotlib.pyplot as plt
 import pickle
 
 from argparse import ArgumentParser
@@ -13,9 +12,10 @@ import torch.optim as optim
 from collector import dataCollector
 from train import trainer
 from test import test
+from networks import gridNet, linearNet
 
-parser = ArgumentParser(description="Parameters for the code - gated trace")
-parser.add_argument('--trace_type', type=str, default="gated", help="gated or accumulating" )
+parser = ArgumentParser(description="Parameters for the code - semi linear")
+parser.add_argument('--trace_type', type=str, default="ptd", help="ptd or accumulating or etd or etd_adaptive")
 parser.add_argument('--gamma', type=float, default=0.99, help="discount factor")
 parser.add_argument('--n', type=int, default=6, help="chain length")
 parser.add_argument('--t_seeds', type=int, default=25, help="total seeds")
@@ -32,7 +32,7 @@ parser.add_argument('--train_feat', action='store_true', help="train features or
 args = parser.parse_args()
 
 total_seeds = args.t_seeds
-model_params = {8:(0.001, 200), 12:(0.0005, 100), 16:(0.0005, 50)}
+model_params = {8:(0.005, 50), 12:(0.005, 50), 16:(0.01, 50)} # load the best feature net
 
 def weights_init(m):
 	if isinstance(m, nn.Conv2d) or isinstance(m, nn.Linear):
@@ -50,7 +50,6 @@ for seed in range(total_seeds):
 
 	if args.env == "gridWorld":
 		from grid_world import gridWorld
-		from networks import gridNet, linearNet
 
 		env = gridWorld(n=args.n, po = not(args.fo))
 
@@ -60,43 +59,43 @@ for seed in range(total_seeds):
 
 		else:
 			feat_net = gridNet(n=args.n)
-			path = "size_"+str(args.n)+"_lr_"+str(model_params[args.n][0])+"_epi_"+str(model_params[args.n][1])+".pt"
+			path = "models_gridWorld/drl_MC_FO_env_gridWorld_size_"+str(args.n)+"_lr_"+str(model_params[args.n][0])+"_seed_"+str(args.seed)+"_epi_"+str(model_params[args.n][1])+".pt"
 			feat_net.load_state_dict(torch.load(path))
 			feat_net.eval()
 			feat_net.to(device)
 
 			val_net = linearNet()
 
-	elif args.env == "lightWorld":
-		from light_world import lightWorld
-		from networks import lightNet, linearNet
+	elif args.env == "gridWorld2":
+		from grid_world2 import gridWorld2
 
-		env = lightWorld(n=args.n)
+		env = gridWorld2(n=args.n, po = not(args.fo), seed=args.seed)
 
 		if args.train_feat:
-			val_net = lightNet(n=args.n)
+			val_net = gridNet(n=args.n)
 			val_net.to(device)
 
 		else:
 			feat_net = gridNet(n=args.n)
-			path = "size_"+str(args.n)+"_lr_"+str(model_params[args.n][0])+"_epi_"+str(model_params[args.n][1])+".pt"
+			path = "models_gridWorld/drl_MC_FO_env_gridWorld_size_"+str(args.n)+"_lr_"+str(model_params[args.n][0])+"_seed_"+str(args.seed)+"_epi_"+str(model_params[args.n][1])+".pt"
 			feat_net.load_state_dict(torch.load(path))
 			feat_net.eval()
 			feat_net.to(device)
 			
 			val_net = linearNet()
 
+	else:
+		raise NotImplementedError
+
 	env.seed(args.seed)
 
 	data_collector = dataCollector(env, args)
 	data_list = data_collector.collect_data()
+	#data_list = data_collector.load_data()
 	
 	if args.train_feat:
-		#import pdb; pdb.set_trace()
 		val_net.apply(weights_init)
 		optimizer = optim.Adam(val_net.parameters(), lr=args.lr)
-		#scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, factor=0.1, patience=10, threshold=0.03, verbose=True)
-		#scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=20, gamma=0.6)
 		scheduler = None
 		train_cls = trainer(args, val_net, data_list, device, optimizer, scheduler)
 	else:
@@ -110,7 +109,7 @@ for seed in range(total_seeds):
 			filename = "drl_MC_FO"+"_env_"+str(args.env)+"_size_"+str(args.n)+"_lr_"+str(args.lr)+"_seed_"+str(args.seed)+"_epi_"+str(args.episodes)
 
 		else:
-			if args.trace_type == "etd":
+			if args.trace_type in ["etd", "etd_adaptive"]:
 				filename = "drl_"+args.trace_type+"_int_"+str(args.intrst)+"_env_"+str(args.env)+"_size_"+str(args.n)+"_lr_"+str(args.lr)+"_seed_"+str(args.seed)+"_epi_"+str(args.episodes)
 			else:
 				filename = "drl_"+args.trace_type+"_env_"+str(args.env)+"_size_"+str(args.n)+"_lr_"+str(args.lr)+"_seed_"+str(args.seed)+"_epi_"+str(args.episodes)

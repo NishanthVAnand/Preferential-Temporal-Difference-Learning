@@ -1,5 +1,0 @@
-gated,0
-accumulating,0
-etd,0.01
-etd,0.05
-etd,0.1

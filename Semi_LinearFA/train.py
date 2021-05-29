@@ -16,7 +16,7 @@ class trainer():
 		torch.manual_seed(self.args.seed)
 
 	def train(self, test_cls):
-		if not(self.args.env == "gridWorld" or self.args.env == "lightWorld"):
+		if not(self.args.env == "gridWorld" or self.args.env=="gridWorld2"):
 			print("Not a valid Environment")
 			return 0
 
@@ -40,7 +40,7 @@ class trainer():
 					G = self.args.gamma * G + r
 					tar.append(G)
 
-				error = self.criterion(torch.stack(c_val).view(-1,1), torch.tensor(tar[::-1]).view(-1,1))
+				error = self.criterion(torch.stack(c_val).view(-1,1), torch.tensor(tar[::-1]).to(self.device).view(-1,1))
 				self.optimizer.zero_grad()
 				error.backward()
 				self.optimizer.step()
@@ -74,21 +74,22 @@ class trainer():
 					c_val = self.linearNet.forward(c_f)
 					n_val = self.linearNet.forward(n_f)
 
-					#import pdb; pdb.set_trace()
-
 					if not done:
 						td_error = (rew + self.args.gamma * n_val - c_val)
 					else:
 						td_error = rew - c_val
-
-					#print(done, rew, c_val.item(), td_error.item())
 
 					if self.args.trace_type == "etd":
 						F_t = self.args.gamma * F_t + self.args.intrst
 						M_t = (1-beta) * self.args.intrst + beta * F_t
 						trace = self.args.gamma * (1-beta) * trace + M_t * c_f
 
-					elif self.args.trace_type == "gated":
+					elif self.args.trace_type == "etd_adaptive":
+						F_t = self.args.gamma * F_t + self.args.intrst * beta
+						M_t = (1-beta) * self.args.intrst * beta + beta * F_t
+						trace = self.args.gamma * (1-beta) * trace + M_t * c_f
+
+					elif self.args.trace_type == "ptd":
 						trace = self.args.gamma * (1-beta) * trace + beta * c_f
 
 					elif self.args.trace_type == "accumulating":

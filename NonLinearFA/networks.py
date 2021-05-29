@@ -24,11 +24,11 @@ class gridNet(nn.Module):
 
 '''
 class gridNet(nn.Module):
-    def __init__(self, n):
+    def __init__(self, n, hidden=4):
         super(gridNet, self).__init__()
         self.n = n
-        self.fc1 = nn.Linear(self.n*self.n, 32)
-        self.fc3 = nn.Linear(32, 1)
+        self.fc1 = nn.Linear(self.n*self.n, hidden)
+        self.fc3 = nn.Linear(hidden, 1)
 
     def forward(self, x):
         x = F.relu(self.fc1(x.flatten()))

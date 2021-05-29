@@ -3,6 +3,7 @@ import torch.nn as nn
 import numpy as np
 
 from grid_world import gridWorld
+from grid_world2 import gridWorld2
 from light_world import lightWorld
 
 class test():
@@ -26,7 +27,7 @@ class test():
 		for i in range(self.env.n**2):
 			state = (i//self.env.n, i%self.env.n)
 
-			if isinstance(self.env, gridWorld):
+			if isinstance(self.env, gridWorld) or isinstance(self.env, gridWorld2):
 				if not (state in self.env.po_states):
 					v_pi_mask[i] = 1
 					temp = np.zeros((self.env.n,self.env.n))

@@ -24,3 +24,10 @@ class dataCollector():
       data_list.append(curr_epi_list)
 
     return data_list
+
+  def load_data(self):
+    fname_data = "drl_env_"+str(self.args.env)+"_size_"+str(self.args.n)+"_seed_"+str(self.seed)+"_epi_250"
+    with open("../NonLinearFA/data/"+fname_data+"_data.pkl", "rb") as f:
+      data_list = pickle.load(f)
+
+    return data_list

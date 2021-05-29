@@ -109,10 +109,20 @@ results_Fourrooms/
 results_randomWalk/
 results_YChain/
 results_gridWorld/
+results_gridWorld2/
 results_lightWorld/
+data/
+results_AC/
+results_AC_linear/
+results_gridWorld/
+results_True_AC/
 models_gridWorld/
-plots/
+Backprop/
 
 *.pt
-*.sh
-*.txt
+*.ipynb
+*.pdf
+*.drawio
+
+.gitignore*
+

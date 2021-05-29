@@ -1,6 +1,5 @@
 import numpy as np
 import gym
-import matplotlib.pyplot as plt
 import pickle
 
 from argparse import ArgumentParser
@@ -65,6 +64,10 @@ for seed in range(total_seeds):
 	train_cls = trainer(args, data_list, val_net, optimizer, device)
 	test_cls = test(args, env, np.ones((env.n**2,env.action_space.n))/env.action_space.n, device)
 	val_net, error_list = train_cls.train(test_cls)
+
+	import matplotlib.pyplot as plt
+	plt.plot(error_list)
+	plt.show()
 
 	if args.log == 1 and args.save == 1:
 		if args.trace_type == "etd":

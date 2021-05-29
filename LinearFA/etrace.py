@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import pickle
 from argparse import ArgumentParser
 
-parser = ArgumentParser(description="Parameters for the code - gated trace")
+parser = ArgumentParser(description="Parameters for the code - etrace")
 parser.add_argument('--seed', type=int, default=0, help="seed")
 parser.add_argument('--len', type=int, default=10, help="chain length")
 parser.add_argument('--var', type=float, default=0.3, help="reward variance")
@@ -16,26 +16,7 @@ parser.add_argument('--log', type=int, default=1, help="compute the results")
 parser.add_argument('--save', type=int, default=1, help="save the results")
 args = parser.parse_args()
 
-if args.env == "simpleChain":
-	filename = "etrace"+"_env_"+str(args.env)+"_len_"+str(args.len)+"_lr_"+str(args.lr)+"_seed_"+str(args.seed)
-
-	def fbetas(env):
-		def getbetas(state):
-			if state in [0, args.len]:
-				return 1
-			else:
-				return 0.01
-		return getbetas
-	
-	from chain import simpleChain
-
-	env = simpleChain(n=args.len+1)
-	betas = fbetas(env)
-	fo_states = [i for i in range(0, args.len)]
-	v_pi = {i:j for i, j in zip(fo_states,list(reversed(range(1,args.len+1))))}
-	weights = np.zeros_like(np.array(env.feat).reshape(-1,1))
-
-elif args.env == "YChain":
+if args.env == "YChain":
 	filename = "etrace"+"_env_"+str(args.env)+"_len_"+str(args.len)+"_lr_"+str(args.lr)+"_seed_"+str(args.seed)
 
 	def fbetas(env):
@@ -77,44 +58,6 @@ elif args.env == "elevator":
 	v_pi = {i:0.5*(1+i[1]) for i in fo_states} 
 	weights = np.zeros_like(np.array(env.feat).reshape(-1,1))
 
-elif args.env == "randomWalk":
-
-	def fbetas(env):
-		def getbetas(state):
-			return 1 - args.lamb
-		return getbetas
-
-	from random_walk import randomWalk
-
-	env = randomWalk()
-	betas = fbetas(env)
-	action_1_prob = 0.5
-	action_2_prob = 1-action_1_prob
-	fo_states = [i for i in range(env.observation_space.n)]
-	v_pi = {idx: i for idx, i in enumerate(np.arange(-18, 20, 2) / 20.0)}
-	weights = 0.*np.ones_like(np.array(env.feat).reshape(-1,1))
-
-elif args.env == "Fourrooms":
-	filename = "etrace"+"_env_"+str(args.env)+"_lr_"+str(args.lr)+"_seed_"+str(args.seed)
-	
-	def fbetas(env):
-		def getbetas(state):
-			if state in env.hallway_states:
-				return 1
-			else:
-				return 0
-		return getbetas
-
-	from four_room import Fourrooms
-
-	env = Fourrooms(slippery=0)
-	betas = fbetas(env)
-	fo_states = env.hallway_states
-	policy = np.ones((env.observation_space.n, env.action_space.n))/env.action_space.n
-	R_pi, P_pi = np.einsum('as,sa->s', env.generateR(), policy), np.einsum('ijk, ji -> jk', env.generateP(), policy)
-	v_pi = {idx:i for idx, i in enumerate(np.linalg.solve((np.eye(env.observation_space.n) - 1.0*P_pi), R_pi))}
-	weights = np.zeros_like(np.array(env.feat).reshape(-1,1))
-
 else:
 	raise NotImplementedError
 
@@ -122,16 +65,10 @@ env.seed(args.seed)
 np.random.seed(args.seed)
 
 def getAction(args):
-	if args.env == "simpleChain":
-		return 0
-	elif args.env == "YChain":
+	if args.env == "YChain":
 		return np.random.binomial(1, action_1_prob)
 	elif args.env == "elevator":
 		return np.random.binomial(1, action_1_prob)
-	elif args.env == "randomWalk":
-		return np.random.binomial(1, action_1_prob)
-	elif args.env == "Fourrooms":
-		return np.random.randint(4)
 	else:
 		raise NotImplementedError
 
@@ -153,7 +90,7 @@ for n_epi in range(args.episodes):
 			next_val = np.array(next_s).T.dot(weights)
 			td_error = reward + next_val - curr_val
 		trace = np.array(curr_s).reshape(-1,1) + (1-betas(c_s)) * trace
-		weights = weights + args.lr * td_error * trace #learning rate: 0.01
+		weights = weights + args.lr * td_error * trace
 		c_s = n_s
 		curr_s = next_s
 
@@ -175,13 +112,3 @@ if args.log == 1 and args.save == 1:
 
 	with open("results_"+str(args.env)+"/"+filename+"_all_errors.pkl", "wb") as f:
 		pickle.dump(errors, f)
-
-# print(weights)
-# print(value_pred, v_pi)
-# fig, ax = plt.subplots(2,1)
-# ax[0].plot(errors)
-# ax[1].plot(emp_state_error)
-# plt.show()
-#plt.plot(errors)
-#plt.show()
-#print(np.mean([i**0.5 for i in errors]))

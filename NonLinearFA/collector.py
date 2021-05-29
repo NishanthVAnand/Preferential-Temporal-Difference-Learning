@@ -16,7 +16,9 @@ class dataCollector():
       while not done:
         action = np.random.randint(0, self.env.action_space.n)
         next_feat, next_state, n_po, reward, done, _ = self.env.step(action)
+        
         curr_epi_list.append((curr_feat, next_feat, reward, c_po, done))
+        
         curr_feat = next_feat
         curr_state = next_state
         c_po = n_po

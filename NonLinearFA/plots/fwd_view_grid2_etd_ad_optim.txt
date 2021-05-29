@@ -1,0 +1,15 @@
+gridWorld2,etd_adaptive,1,8,0.001
+gridWorld2,etd_adaptive,1,12,0.0005
+gridWorld2,etd_adaptive,1,16,0.0005
+gridWorld2,etd_adaptive,2,8,0.001
+gridWorld2,etd_adaptive,2,12,0.0005
+gridWorld2,etd_adaptive,2,16,0.0005
+gridWorld2,etd_adaptive,4,8,0.001
+gridWorld2,etd_adaptive,4,12,0.0005
+gridWorld2,etd_adaptive,4,16,0.0005
+gridWorld2,etd_adaptive,8,8,0.001
+gridWorld2,etd_adaptive,8,12,0.0005
+gridWorld2,etd_adaptive,8,16,0.0005
+gridWorld2,etd_adaptive,16,8,0.001
+gridWorld2,etd_adaptive,16,12,0.0005
+gridWorld2,etd_adaptive,16,16,0.0005

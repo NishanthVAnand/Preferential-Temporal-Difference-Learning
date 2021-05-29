@@ -3,7 +3,7 @@ import torch.nn as nn
 import numpy as np
 
 from grid_world import gridWorld
-from light_world import lightWorld
+from grid_world2 import gridWorld2
 
 class test():
 	def __init__(self, args, env, policy, device):
@@ -51,7 +51,7 @@ class test():
 		v_pi_m = self.v_pi * v_pi_mask
 		v_pi_m = v_pi_m[v_pi_m != 0]
 
-		return self.criterion(torch.tensor(v_pred).float(), torch.from_numpy(v_pi_m).float())
+		return self.criterion(torch.tensor(v_pred), torch.from_numpy(v_pi_m).float())
 
 	def MSE_linear(self, feat_net, val_net):
 		test_data = []
@@ -60,7 +60,7 @@ class test():
 		for i in range(self.env.n**2):
 			state = (i//self.env.n, i%self.env.n)
 
-			if isinstance(self.env, gridWorld):
+			if isinstance(self.env, gridWorld) or isinstance(self.env, gridWorld2):
 				if not (state in self.env.po_states):
 					v_pi_mask[i] = 1
 					temp = np.zeros((self.env.n,self.env.n))
