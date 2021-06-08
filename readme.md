@@ -23,11 +23,14 @@ The next two settings requires `pytorch` to reproduce the figures.
 
 ## Semi-Linear
 
-The feature net parameters are stored in the directory: `Semi_LinearFA/models_gridWorld/`
+First run the feature net by executing the following command:
+```
+cd Semi_LinearFA
+./run_MC.sh
+```
 Running the following commands will reproduce results presented in Figure 4 and A.8 by loading the trained feature net models.
 
 ```
-cd Semi_LinearFA
 ./run_task1.sh
 ./run_task2.sh
 ```
